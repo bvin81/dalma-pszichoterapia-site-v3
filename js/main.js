@@ -709,7 +709,7 @@ function initScrollReveal() {
         observer.unobserve(entry.target);
       }
     });
-  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+  }, { threshold: 0.05, rootMargin: '0px' });
 
   requestAnimationFrame(() => {
     // Service cards: felváltva bal/jobb oldalról úsznak be, egyenként
@@ -718,7 +718,7 @@ function initScrollReveal() {
 
     serviceCards.forEach((el, i) => {
       const rect = el.getBoundingClientRect();
-      if (rect.top >= window.innerHeight) {
+      if (rect.top >= window.innerHeight * 0.9) {
         el.classList.add(i % 2 === 0 ? 'reveal-left' : 'reveal-right');
         el.style.transitionDelay = `${i * 0.18}s`;
         observer.observe(el);
@@ -748,12 +748,19 @@ function initScrollReveal() {
       document.querySelectorAll(selector).forEach(el => {
         if (serviceCardSet.has(el)) return;
         const rect = el.getBoundingClientRect();
-        if (rect.top >= window.innerHeight) {
+        if (rect.top >= window.innerHeight * 0.9) {
           el.classList.add('reveal');
           observer.observe(el);
         }
       });
     });
+
+    // Biztonsági fallback: ha valami nem animálódna be 3s után, kényszermegjelenítés
+    setTimeout(() => {
+      document.querySelectorAll('.reveal-left:not(.visible), .reveal-right:not(.visible), .reveal:not(.visible)').forEach(el => {
+        el.classList.add('visible');
+      });
+    }, 3000);
   });
 }
 
