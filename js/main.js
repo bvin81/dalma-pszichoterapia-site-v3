@@ -889,11 +889,11 @@ function initServicesCardStack() {
   let topIdx = 0;
   let animating = false;
 
-  // Fixed stack styles by position
+  // Fixed stack styles by position (tx = horizontal offset so corners poke out)
   const ST = [
-    { z: 10, ty: 0,  sc: 1,    rot: 0,    op: 1   },
-    { z: 9,  ty: 10, sc: 0.96, rot: -2,   op: 0.9 },
-    { z: 8,  ty: 20, sc: 0.92, rot: 2.5,  op: 0.8 },
+    { z: 10, tx:   0, ty:  0, sc: 1,    rot:  0, op: 1   },
+    { z: 9,  tx: -12, ty:  8, sc: 0.96, rot: -6, op: 0.9 },
+    { z: 8,  tx:  12, ty: 14, sc: 0.92, rot:  6, op: 0.8 },
   ];
 
   // Create STACK card elements + detail overlay + swipe hint
@@ -908,11 +908,6 @@ function initServicesCardStack() {
   const overlay = document.createElement('div');
   overlay.className = 'svc-detail-overlay';
   overlay.innerHTML = `
-    <button class="svc-detail-close" aria-label="Bezárás">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18">
-        <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
-      </svg>
-    </button>
     <img class="svc-detail-cover" src="" alt="">
     <div class="svc-detail-body">
       <h3 class="svc-detail-h3"></h3>
@@ -920,7 +915,27 @@ function initServicesCardStack() {
       <a class="btn btn-secondary svc-detail-link" href="#" data-key="service_more">Bővebben</a>
     </div>`;
   wrapper.appendChild(overlay);
-  overlay.querySelector('.svc-detail-close').addEventListener('click', () => overlay.classList.remove('open'));
+
+  // Tap anywhere on overlay (except the Bővebben link) → close
+  overlay.addEventListener('click', (e) => {
+    if (e.target.closest('.svc-detail-link')) return;
+    overlay.classList.remove('open');
+  });
+
+  // Swipe on overlay → cycle cards without leaving detail view
+  let ovSx = 0, ovDx = 0, ovMoved = false;
+  overlay.addEventListener('touchstart', (e) => {
+    ovSx = e.touches[0].clientX; ovDx = 0; ovMoved = false;
+  }, { passive: true });
+  overlay.addEventListener('touchmove', (e) => {
+    ovDx = e.touches[0].clientX - ovSx;
+    if (Math.abs(ovDx) > 8) { ovMoved = true; e.preventDefault(); }
+  }, { passive: false });
+  overlay.addEventListener('touchend', () => {
+    if (ovMoved && Math.abs(ovDx) > 60) {
+      cycleOverlay(ovDx < 0 ? 1 : -1);
+    }
+  });
 
   const hint = document.createElement('p');
   hint.className = 'svc-swipe-hint';
@@ -953,7 +968,7 @@ function initServicesCardStack() {
     el.style.opacity = String(s.op);
     el.style.transform = sp === 0
       ? `translateX(${tx}px) rotate(${rot}deg)`
-      : `translateY(${s.ty}px) scale(${s.sc}) rotate(${s.rot}deg)`;
+      : `translateX(${s.tx}px) translateY(${s.ty}px) scale(${s.sc}) rotate(${s.rot}deg)`;
   }
 
   function render() {
@@ -975,6 +990,23 @@ function initServicesCardStack() {
     overlay.querySelector('.svc-detail-link').href = bp + s.url;
     if (cachedTranslations) updateDOM(cachedTranslations);
     overlay.classList.add('open');
+  }
+
+  function cycleOverlay(dir) {
+    if (dir > 0) {
+      topIdx = (topIdx + 1) % N;
+      stackOrder = [...stackOrder.slice(1), stackOrder[0]];
+    } else {
+      topIdx = (topIdx - 1 + N) % N;
+      stackOrder = [stackOrder[STACK - 1], ...stackOrder.slice(0, STACK - 1)];
+    }
+    for (let sp = 0; sp < STACK; sp++) {
+      fillCard(stackOrder[sp], svcOf(sp));
+      placeCard(stackOrder[sp], sp, 0, 0, false);
+    }
+    if (cachedTranslations) updateDOM(cachedTranslations);
+    bindTopCard();
+    openDetail(svcOf(0));
   }
 
   function cycleForward(dir) {
@@ -1007,7 +1039,7 @@ function initServicesCardStack() {
       const bs = ST[STACK - 1];
       cardEls[newBottomElIdx].style.transition = 'none';
       cardEls[newBottomElIdx].style.zIndex = String(bs.z);
-      cardEls[newBottomElIdx].style.transform = `translateY(${bs.ty}px) scale(${bs.sc}) rotate(${bs.rot}deg)`;
+      cardEls[newBottomElIdx].style.transform = `translateX(${bs.tx}px) translateY(${bs.ty}px) scale(${bs.sc}) rotate(${bs.rot}deg)`;
       cardEls[newBottomElIdx].style.opacity = '0';
 
       // Fade it in
