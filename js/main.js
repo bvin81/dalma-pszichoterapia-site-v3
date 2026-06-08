@@ -765,6 +765,33 @@ function initScrollReveal() {
 }
 
 /* ---------------------------------------------------
+   SERVICES ACCORDION
+--------------------------------------------------- */
+function initServicesAccordion() {
+  const items = document.querySelectorAll('.accordion-item');
+  if (!items.length) return;
+
+  items.forEach(item => {
+    const header = item.querySelector('.accordion-header');
+    const body = item.querySelector('.accordion-body');
+
+    header.addEventListener('click', () => {
+      const isOpen = header.getAttribute('aria-expanded') === 'true';
+
+      items.forEach(i => {
+        i.querySelector('.accordion-header').setAttribute('aria-expanded', 'false');
+        i.querySelector('.accordion-body').classList.remove('open');
+      });
+
+      if (!isOpen) {
+        header.setAttribute('aria-expanded', 'true');
+        body.classList.add('open');
+      }
+    });
+  });
+}
+
+/* ---------------------------------------------------
    VIDEO CAROUSEL
 --------------------------------------------------- */
 function initVideoCarousel() {
@@ -834,6 +861,7 @@ document.addEventListener('DOMContentLoaded', function() {
   initHeaderScroll();
   initHeroKenBurns();
   initScrollReveal();
+  initServicesAccordion();
   initVideoCarousel();
 
   if (document.getElementById("blogContainer")) {

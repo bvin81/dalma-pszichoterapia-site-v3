@@ -360,3 +360,108 @@ html {
   visibility: hidden;
   pointer-events: none;
 }
+
+/* =================================================================
+   SZOLGÁLTATÁSOK ACCORDION
+   ================================================================= */
+
+.services-accordion {
+  max-width: 800px;
+  margin: 0 auto;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.accordion-item {
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.accordion-header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-md) 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: var(--font-size-xl);
+  font-family: var(--font-heading);
+  font-weight: 600;
+  color: var(--text-main);
+  text-align: left;
+  transition: color var(--transition-fast);
+  gap: var(--spacing-sm);
+}
+
+.accordion-header:hover {
+  color: var(--accent-main);
+}
+
+.accordion-header[aria-expanded="true"] {
+  color: var(--accent-main);
+}
+
+.accordion-icon {
+  width: 28px;
+  height: 28px;
+  fill: currentColor;
+  flex-shrink: 0;
+  transition: transform var(--transition-smooth);
+}
+
+.accordion-header[aria-expanded="true"] .accordion-icon {
+  transform: rotate(180deg);
+}
+
+.accordion-body {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease;
+}
+
+.accordion-body.open {
+  max-height: 300px;
+}
+
+.accordion-content {
+  display: flex;
+  gap: var(--spacing-md);
+  align-items: flex-start;
+  padding-bottom: var(--spacing-md);
+}
+
+.accordion-content img {
+  width: 220px;
+  height: 140px;
+  object-fit: cover;
+  border-radius: var(--radius-md);
+  flex-shrink: 0;
+}
+
+.accordion-text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.accordion-text p {
+  color: var(--text-muted);
+  font-size: var(--font-size-base);
+  line-height: 1.6;
+  margin: 0;
+}
+
+@media (max-width: 600px) {
+  .accordion-content {
+    flex-direction: column;
+  }
+
+  .accordion-content img {
+    width: 100%;
+    height: 160px;
+  }
+
+  .accordion-header {
+    font-size: var(--font-size-lg);
+  }
+}
