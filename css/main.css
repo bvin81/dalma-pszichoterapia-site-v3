@@ -371,14 +371,58 @@ html {
   gap: var(--spacing-md);
 }
 
-.book {
+/* --- Keretező elem: lapszél-rétegek itt jelennek meg --- */
+.book-frame {
   flex: 1;
-  display: flex;
   position: relative;
+}
+
+/* Bal oldal: már átforgatott lapok */
+.book-frame::before {
+  content: '';
+  position: absolute;
+  top: 5px;
+  left: 0;
+  width: calc(50% - 7px);
+  height: calc(100% - 10px);
+  background: linear-gradient(to right, #e8e2d8, #f0ece5);
+  border-radius: var(--radius-card) 0 0 var(--radius-card);
+  z-index: 0;
+  box-shadow:
+    -3px 3px 0 0 #e3ddd3,
+    -6px 6px 0 0 #ddd7cc,
+    -9px 9px 0 0 #d8d2c6;
+}
+
+/* Jobb oldal: még lapozatlan lapok */
+.book-frame::after {
+  content: '';
+  position: absolute;
+  top: 5px;
+  right: 0;
+  width: calc(50% - 7px);
+  height: calc(100% - 10px);
+  background: #f5f2ee;
+  border-radius: 0 var(--radius-card) var(--radius-card) 0;
+  z-index: 0;
+  box-shadow:
+    3px 3px 0 0 #f0ece7,
+    6px 6px 0 0 #ece7e1,
+    9px 9px 0 0 #e8e2db;
+}
+
+/* --- A könyv maga --- */
+.book {
+  position: relative;
+  z-index: 1;
+  display: flex;
   perspective: 2500px;
   min-height: 400px;
   border-radius: var(--radius-card);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
+  box-shadow:
+    0 2px 0 0 rgba(0,0,0,0.06),
+    0 10px 30px rgba(0,0,0,0.12),
+    0 24px 60px rgba(0,0,0,0.10);
 }
 
 .book-page {
@@ -389,15 +433,38 @@ html {
 }
 
 .book-left {
-  background: linear-gradient(to right, #ede8e1, var(--bg-surface));
-  border-right: 2px solid var(--border-subtle);
-  box-shadow: inset -6px 0 16px rgba(0, 0, 0, 0.05);
+  background: linear-gradient(105deg, #eee8df 0%, #f8f5f1 60%, var(--bg-surface) 100%);
   border-radius: var(--radius-card) 0 0 var(--radius-card);
+  box-shadow: inset -8px 0 20px rgba(0,0,0,0.06);
 }
 
 .book-right-bg {
   background: var(--bg-surface);
   border-radius: 0 var(--radius-card) var(--radius-card) 0;
+  box-shadow: inset 8px 0 20px rgba(0,0,0,0.03);
+}
+
+/* Könyvgerinc */
+.book-spine-bar {
+  position: absolute;
+  top: 0;
+  left: calc(50% - 7px);
+  width: 14px;
+  height: 100%;
+  z-index: 8;
+  pointer-events: none;
+  background: linear-gradient(to right,
+    #7a6454 0%,
+    #a88870 20%,
+    #c0a488 40%,
+    #b89880 60%,
+    #a07860 80%,
+    #886050 100%
+  );
+  box-shadow:
+    inset 3px 0 6px rgba(0,0,0,0.3),
+    inset -3px 0 6px rgba(0,0,0,0.3),
+    0 0 8px rgba(0,0,0,0.15);
 }
 
 /* Lapozó elem */
@@ -423,12 +490,14 @@ html {
 .book-flip-front {
   background: var(--bg-surface);
   border-radius: 0 var(--radius-card) var(--radius-card) 0;
+  box-shadow: inset 8px 0 20px rgba(0,0,0,0.03);
 }
 
 .book-flip-back {
   transform: rotateY(180deg);
-  background: linear-gradient(to right, #ede8e1, var(--bg-surface));
+  background: linear-gradient(105deg, #eee8df 0%, #f8f5f1 60%, var(--bg-surface) 100%);
   border-radius: var(--radius-card) 0 0 var(--radius-card);
+  box-shadow: inset -8px 0 20px rgba(0,0,0,0.06);
 }
 
 /* Oldal tartalom */
@@ -527,6 +596,11 @@ html {
 }
 
 @media (max-width: 700px) {
+  .book-frame::before,
+  .book-frame::after {
+    display: none;
+  }
+
   .book-right-bg {
     display: none;
   }
@@ -535,6 +609,10 @@ html {
     border-right: none;
     background: var(--bg-surface);
     border-radius: var(--radius-card);
+  }
+
+  .book-spine-bar {
+    display: none;
   }
 
   .book-flip {
